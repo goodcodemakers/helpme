@@ -1,9 +1,1 @@
-{
-  "items": [
-    {
-      "itemName": "사과",
-      "quantity": 10,
-      "memo": "신선한 사과"
-    }]
-  }
-  
+{"items":[{"itemName":"2","quantity":"2","memo":"2"},{"itemName":"복숭아","quantity":"4","memo":"어피치!"},{"itemName":"3","quantity":"3","memo":"3"},{"itemName":"3","quantity":"3","memo":"3"},{"itemName":"1","quantity":"6","memo":"한입 먹은 애플"},{"itemName":"1","quantity":"6","memo":"한입 먹은 애플"},{"itemName":"1","quantity":"6","memo":"한입 먹은 애플"},{"itemName":"안녕","quantity":"3","memo":"2"}]}

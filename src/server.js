@@ -1,56 +1,76 @@
-// server.js
-
 const express = require('express');
 const app = express();
 const ejs = require("ejs");
 const fs = require("fs"); 
 const path = require("path"); 
 
-// PORT
-const PORT = 3001;
+const PORT = 3080;
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-
-// express Post
-// 정적 파일을 제공할 때 올바른 경로를 설정
 app.use(express.static(path.join(__dirname, "src"))); 
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
-// main.json 파일 읽기
-const readFile = fs.readFileSync(path.join(__dirname, "main.json"), "utf-8"); 
-const jsonData = JSON.parse(readFile);
-const listArr = jsonData.items ||[]; 
+app.get('/', function(req, res) {
+    const readFile = fs.readFileSync(path.join(__dirname, "main.json"), "utf-8");
+    const jsonData = JSON.parse(readFile);
 
-app.get("/", function(req, res){
-    res.render("index", { listArr }); 
+    const listArr = Array.isArray(jsonData.items) ? jsonData.items : [];
+
+    res.render("index.ejs", { listArr: listArr })
 });
 
-// addItem 엔드포인트 추가
-app.post("/addItem", (req, res) => {
-    const { itemName, quantity, memo } = req.body;
-    
-    // 새로운 재고 항목 생성
-    const newItem = {
-        itemName,
-        quantity,
-        memo
-    };
 
-    // main.json에 새로운 재고 항목 추가
-    listArr.push(newItem);
+app.post("/save", (req, res) => {
+    const host = req.headers.host;
+    const itemName = req.body.itemName;
+    const quantity = req.body.quantity;
+    const memo = req.body.memo;
+
+
+    fetch(`http://localhost:${PORT}/addItem`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            itemName: itemName,
+            quantity: quantity,
+            memo: memo
+        }),
+    })
+    .then(response => response.json())
+    .catch((error) => console.error('Error:', error));
+    res.redirect(host)
+  });
+
+// post로 변경했어요 :D
+app.post("/addItem", (req, res) => {
+    const readFile = fs.readFileSync(path.join(__dirname, "main.json"), "utf-8");
+    const jsonData = JSON.parse(readFile);
+    const listArr = jsonData.items || [];
+
+    const data = req.body;
+
+    try {
+
+        listArr.push(data);
+    } catch (error) {
+        return res.status(400).send(`{"상태":"나쁨","이유":"올바르지 않는 입력"}`);
+    }
+
     jsonData.items = listArr;
     fs.writeFileSync(path.join(__dirname, "main.json"), JSON.stringify(jsonData));
 
-    // 클라이언트에 응답 전송
     res.json(jsonData.items);
 });
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 }).on('error', (err) => {
     console.error('Server start error:', err);
-    process.exit(1); // 에러가 발생하면 서버를 종료합니다.
+    process.exit(1);
 });

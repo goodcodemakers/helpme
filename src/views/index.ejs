@@ -10,21 +10,21 @@
 <body>
   <h1>재고 정리 </h1>
 
-  <!-- 입력 필드 -->
-  <input type="text" id="itemName" placeholder="품명">
-  <input type="number" id="quantity" placeholder="수량">
-  <input type="text" id="memo" placeholder="메모">
-  <button id="submitButton">등록</button>
-
-  <!-- 재고 리스트 -->
+  <form action="/save" method="POST">
+    <input type="text" name="itemName" placeholder="품명">
+    <input type="number" name="quantity" placeholder="수량">
+    <input type="text" name="memo" placeholder="메모">
+    <button type="submit">등록</button>
+  </form>
+  
   <h2>재고 리스트 </h2>
   <ul id="inventoryList">
     <% listArr.forEach(function(item) { %>
       <li>품명: <%= item.itemName %>, 수량: <%= item.quantity %>, 메모: <%= item.memo %></li>
-    <% }); %>
-  </ul>
-
-  
-  <script src="/index.js"></script>
+      <% }); %>
+    </ul>
+    
+    
+    <script src="/index.js"></script>
 </body>
 </html>
