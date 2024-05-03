@@ -67,6 +67,26 @@ app.post("/addItem", (req, res) => {
     res.json(jsonData.items);
 });
 
+// 품목 수량 수정 엔드포인트
+app.put("/updateQuantity/:id", (req, res) => {
+    const itemId = req.params.id;
+    const newQuantity = req.body.quantity;
+
+    const readFile = fs.readFileSync(path.join(__dirname, "main.json"), "utf-8");
+    const jsonData = JSON.parse(readFile);
+    const listArr = jsonData.items || [];
+
+    const itemToUpdate = listArr.find(item => item.id === itemId);
+    if (!itemToUpdate) {
+        return res.status(404).json({ error: "품목을 찾을 수 없습니다." });
+    }
+
+    itemToUpdate.quantity = newQuantity;
+
+    fs.writeFileSync(path.join(__dirname, "main.json"), JSON.stringify(jsonData));
+
+    res.json({ quantity: newQuantity });
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

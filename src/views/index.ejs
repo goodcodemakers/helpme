@@ -6,8 +6,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inventory Management</title>
+  <style>
+    /* CSS 스타일링 */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+    }
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    input[type="text"], input[type="number"] {
+        width: calc(100% - 10px);
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+    button {
+        padding: 8px 12px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    .quantity-btn {
+        margin-left: 10px;
+    }
+    .hidden {
+        display: none;
+    }
+   
+    </style>
 </head>
 <body>
+  <div class="container">
   <h1>재고 정리 </h1>
 
   <form action="/save" method="POST">
@@ -16,15 +54,55 @@
     <input type="text" name="memo" placeholder="메모">
     <button type="submit">등록</button>
   </form>
-  
   <h2>재고 리스트 </h2>
+  <input type="text" id="searchInput" placeholder="제품명을 검색하세요...">
+  <button onclick="search()">검색</button>
   <ul id="inventoryList">
     <% listArr.forEach(function(item) { %>
-      <li>품명: <%= item.itemName %>, 수량: <%= item.quantity %>, 메모: <%= item.memo %></li>
-      <% }); %>
+        <li>품명: <%= item.itemName %>
+            <br>수량: <span id="quantity_<%= item.id %>"><%= item.quantity %></span>
+            <!-- <button onclick="editQuantity('<%= item.id %>')">수량 수정</button> -->
+            메모: <%= item.memo %></li>
+        <br>
+        <br>
+        <% }); %>
     </ul>
+  </div>
     
     
-    <script src="/index.js"></script>
+    <script>
+      function search() {
+    const searchText = searchInput.value.toLowerCase();
+    const items = inventoryList.getElementsByTagName('li');
+    for (let item of items) {
+        const itemName = item.textContent.toLowerCase().split(' - ')[0] ;
+        if (itemName.includes(searchText)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    }
+}
+function editQuantity(itemId) {
+    const newQuantity = prompt("새로운 수량을 입력하세요:");
+    if (newQuantity !== null) {
+        const id = encodeURIComponent(itemId);
+        fetch(`/updateQuantity/${id}`, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ quantity: newQuantity })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById(`quantity_${itemId}`).textContent = data.quantity;
+        })
+        .catch(error => {
+            console.error("Error updating quantity:", error);
+        });
+    }
+  }
+    </script>
 </body>
 </html>

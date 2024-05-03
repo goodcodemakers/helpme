@@ -36,6 +36,8 @@ document.addEventListener("DOMContentLoaded", function() {
       console.error("Error submitting data:", error);
     });
   });
+ 
+ 
 
   // 페이지 로드 시 서버로부터 재고 리스트 가져와서 화면에 표시
   fetch("/getInventory")
@@ -52,3 +54,24 @@ document.addEventListener("DOMContentLoaded", function() {
       console.error("Error fetching inventory:", error);
     });
 });
+
+function editQuantity(itemId) {
+  const newQuantity = prompt("새로운 수량을 입력하세요:");
+  if (newQuantity !== null) {
+      const id = encodeURIComponent(itemId);
+      fetch(`/updateQuantity/${id}`, {
+          method: "PUT",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ quantity: newQuantity })
+      })
+      .then(response => response.json())
+      .then(data => {
+          document.getElementById(`quantity_${itemId}`).textContent = data.quantity;
+      })
+      .catch(error => {
+          console.error("Error updating quantity:", error);
+      });
+  }
+}
